@@ -290,3 +290,67 @@ body, html {
     transform: translateX(0);
     display: block;
 }
+
+/* Auth Forms */
+.auth-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--content-border-color-light);
+    border-radius: 4px;
+    font-size: 16px;
+    background: inherit;
+    color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+    .form-group input {
+        border-color: var(--content-border-color-dark);
+    }
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 10px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+.switch-form {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.switch-form a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.switch-form a:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none !important;
+}

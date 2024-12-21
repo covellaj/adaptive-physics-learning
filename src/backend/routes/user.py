@@ -2,56 +2,129 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from models.user_state import User  # Ensure this matches your actual model name/path
+from models.user_state import User
+import bcrypt
+import jwt
+import os
+from datetime import datetime, timedelta
 
 user_bp = Blueprint('user', __name__)
 
-@user_bp.route('/api/register', methods=['POST'])
+# Use a secure secret key in production
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key')
+JWT_EXPIRATION_HOURS = 24
+
+def generate_token(user_id: int) -> str:
+    expiration = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    return jwt.encode(
+        {'user_id': user_id, 'exp': expiration},
+        JWT_SECRET,
+        algorithm='HS256'
+    )
+
+@user_bp.route('/api/auth/register', methods=['POST'])
 def register_user():
     data = request.get_json()
-    username = data.get('username')
+    name = data.get('name')
+    email = data.get('email')
     password = data.get('password')
-    if not username or not password:
-        return jsonify({"error": "Missing username or password"}), 400
+
+    if not email or not password or not name:
+        return jsonify({"error": "Missing required fields"}), 400
     
-    # Simple password hash = password as is (in real code, use a hashing lib)
-    password_hash = password
+    # Hash password
+    salt = bcrypt.gensalt()
+    password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
     db: Session = SessionLocal()
-    # Check if user already exists
-    existing_user = db.query(User).filter_by(username=username).first()
-    if existing_user:
+    try:
+        # Check if user already exists
+        existing_user = db.query(User).filter_by(email=email).first()
+        if existing_user:
+            return jsonify({"error": "User already exists"}), 400
+
+        new_user = User(name=name, email=email, password_hash=password_hash)
+        db.add(new_user)
+        db.commit()
+        
+        # Generate token
+        token = generate_token(new_user.id)
+        
+        return jsonify({
+            "message": "User registered successfully",
+            "token": token,
+            "user": {
+                "id": new_user.id,
+                "name": new_user.name,
+                "email": new_user.email
+            }
+        }), 201
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
         db.close()
-        return jsonify({"error": "User already exists"}), 400
 
-    new_user = User(username=username, password_hash=password_hash)
-    db.add(new_user)
-    db.commit()
-    db.close()
-    return jsonify({"message": "User registered successfully"}), 201
-
-
-@user_bp.route('/api/login', methods=['POST'])
+@user_bp.route('/api/auth/login', methods=['POST'])
 def login_user():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    if not username or not password:
-        return jsonify({"error": "Missing username or password"}), 400
+    if not email or not password:
+        return jsonify({"error": "Missing email or password"}), 400
     
     db: Session = SessionLocal()
-    user = db.query(User).filter_by(username=username).first()
-    if not user:
+    try:
+        user = db.query(User).filter_by(email=email).first()
+        if not user:
+            return jsonify({"error": "Invalid email or password"}), 401
+        
+        # Verify password
+        if not bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')):
+            return jsonify({"error": "Invalid email or password"}), 401
+        
+        # Generate token
+        token = generate_token(user.id)
+        
+        return jsonify({
+            "message": "Login successful",
+            "token": token,
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
         db.close()
-        return jsonify({"error": "Invalid username or password"}), 401
+
+@user_bp.route('/api/auth/verify', methods=['GET'])
+def verify_token():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({"error": "No token provided"}), 401
     
-    # Compare password with stored password_hash
-    if password != user.password_hash:
+    token = auth_header.split(' ')[1]
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+        db: Session = SessionLocal()
+        user = db.query(User).filter_by(id=payload['user_id']).first()
         db.close()
-        return jsonify({"error": "Invalid username or password"}), 401
-    
-    # For now, just return a simple success message.
-    # Later, we can return a JWT or session token.
-    db.close()
-    return jsonify({"message": "Login successful", "user_id": user.id}), 200
+        
+        if not user:
+            return jsonify({"error": "User not found"}), 401
+            
+        return jsonify({
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email
+            }
+        }), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token has expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401

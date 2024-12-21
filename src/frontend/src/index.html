@@ -46,10 +46,56 @@
                 <button class="close-btn" data-close="options-overlay">&times;</button>
                 <h2>Options</h2>
                 <ul>
-                    <li><a href="#" title="Login">Login</a></li>
-                    <li><a href="#" title="Account">Account</a></li>
+                    <li><a href="#" id="login-link" title="Login">Login</a></li>
+                    <li><a href="#" id="account-link" title="Account" class="hidden">Account</a></li>
+                    <li><a href="#" id="logout-link" title="Logout" class="hidden">Logout</a></li>
                     <li><a href="#" title="Courses">Courses</a></li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- Auth Overlay -->
+        <div id="auth-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <button class="close-btn" data-close="auth-overlay">&times;</button>
+                <div id="login-form" class="auth-form">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">Email:</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password:</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Login</button>
+                    </form>
+                    <p class="switch-form">Don't have an account? <a href="#" id="show-register">Register</a></p>
+                </div>
+                <div id="register-form" class="auth-form hidden">
+                    <h2>Register</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="registerName">Full Name:</label>
+                            <input type="text" id="registerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email:</label>
+                            <input type="email" id="registerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password:</label>
+                            <input type="password" id="registerPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password:</label>
+                            <input type="password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Register</button>
+                    </form>
+                    <p class="switch-form">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </div>
             </div>
         </div>
 
