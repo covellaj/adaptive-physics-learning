@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+    <title>Adaptive Education System</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="page-container">
+        <header class="top-banner">
+            <div class="logo-section">
+                <!-- Placeholder logo (could be replaced with an actual image) -->
+                <div class="logo-placeholder"></div>
+                <div class="program-title">Minerva AI</div>
+            </div>
+            <div class="top-buttons">
+                <button id="chat-toggle" class="icon-button" title="Open AI Chat">
+                    <!-- Futuristic Chat Icon (Placeholder SVG) -->
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                         class="ai-chat-icon">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </button>
+                <button id="options-toggle" class="icon-button" title="Open Options">
+                    <!-- Futuristic Options Icon (Placeholder SVG) -->
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                         class="options-icon">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 .9l-.1.18a2 2 0 0 1-3.58 0l-.1-.18a1.65 1.65 0 0 0-1-.9 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15a1.65 1.65 0 0 0-.9-1l-.18-.1a2 2 0 0 1 0-3.58l.18-.1a1.65 1.65 0 0 0 .9-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.83 4.6l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-.9l.1-.18a2 2 0 0 1 3.58 0l.1.18a1.65 1.65 0 0 0 1 .9h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 .9 1l.18.1a2 2 0 0 1 0 3.58l-.18.1a1.65 1.65 0 0 0-.9 1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <h1>Welcome to the Adaptive Education System</h1>
+            <p>This is where the student's main content will be displayed.</p>
+        </main>
+
+        <!-- Options Overlay -->
+        <div id="options-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <button class="close-btn" data-close="options-overlay">&times;</button>
+                <h2>Options</h2>
+                <ul>
+                    <li><a href="#" title="Login">Login</a></li>
+                    <li><a href="#" title="Account">Account</a></li>
+                    <li><a href="#" title="Courses">Courses</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Chat Overlay -->
+        <div id="chat-overlay" class="overlay hidden">
+            <div class="overlay-content chat-panel">
+                <button class="close-btn" data-close="chat-overlay">&times;</button>
+                <h2>Manager AI Chat</h2>
+                <div class="chat-body">
+                    <p><strong>AI:</strong> Hello! How can I help you today?</p>
+                </div>
+                <div class="chat-input-section">
+                    <input type="text" placeholder="Type your message..." />
+                    <button class="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

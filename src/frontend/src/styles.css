@@ -1,0 +1,292 @@
+/* Use system color scheme preferences */
+:root {
+    color-scheme: light dark;
+    --border-color: rgba(218,165,32,0.5);
+    --border-thickness: 15px;
+    --border-radius: 20px;
+
+    --light-bg: #fafafa;
+    --light-text: #000;
+    --dark-bg: #1e1e1e;
+    --dark-text: #fff;
+
+    --banner-bg-light: #ffffffcc;
+    --banner-bg-dark: #333333cc;
+    --overlay-bg-light: #ffffff;
+    --overlay-bg-dark: #2c2c2c;
+    --content-border-color-light: #ccc;
+    --content-border-color-dark: #555;
+}
+
+/* Light mode defaults */
+body {
+    background: var(--light-bg);
+    color: var(--light-text);
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: var(--dark-bg);
+        color: var(--dark-text);
+    }
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+.page-container {
+    position: relative;
+    min-height: 100vh;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1200px;
+    border: var(--border-thickness) solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    /* Ensure that child elements can overlap the banner border if needed */
+}
+
+.top-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+}
+
+/* Adjust banner background for light/dark */
+@media (prefers-color-scheme: light) {
+    .top-banner {
+        background: var(--banner-bg-light);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .top-banner {
+        background: var(--banner-bg-dark);
+    }
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.logo-placeholder {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #ccc, #eee);
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.program-title {
+    font-size: 2rem;
+    font-weight: bold;
+    position: relative;
+    top: -10px; /* Slight overlap with the banner space for a unique look */
+    /* Additional styling for dark/light contrast is inherited from body */
+}
+
+.top-buttons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+.icon-button svg {
+    display: block;
+    width: 28px;
+    height: 28px;
+}
+
+/* Adjust icon color for dark mode */
+@media (prefers-color-scheme: light) {
+    .icon-button svg {
+        stroke: #000;
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .icon-button svg {
+        stroke: #fff;
+    }
+}
+
+.content-area {
+    padding: 30px;
+}
+
+/* Overlays */
+.overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100%;
+    border-left: 1px solid;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: light) {
+    .overlay {
+        background: var(--overlay-bg-light);
+        border-color: var(--content-border-color-light);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .overlay {
+        background: var(--overlay-bg-dark);
+        border-color: var(--content-border-color-dark);
+    }
+}
+
+.overlay-content {
+    padding: 20px;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: inherit;
+    line-height: 1;
+}
+
+.overlay-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.overlay-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.overlay-content ul li {
+    margin-bottom: 10px;
+}
+
+.overlay-content ul li a {
+    text-decoration: none;
+    font-size: 1.2rem;
+    color: inherit;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Chat Panel Specifics */
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--border-radius);
+}
+
+.chat-body {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid;
+    border-radius: var(--border-radius);
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Adjust chat-body border for dark/light */
+@media (prefers-color-scheme: light) {
+    .chat-body {
+        border-color: var(--content-border-color-light);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .chat-body {
+        border-color: var(--content-border-color-dark);
+    }
+}
+
+.chat-body p {
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.chat-input-section {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-section input {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid;
+    background: inherit;
+    color: inherit;
+}
+
+@media (prefers-color-scheme: light) {
+    .chat-input-section input {
+        border-color: var(--content-border-color-light);
+    }
+}
+@media (prefers-color-scheme: dark) {
+    .chat-input-section input {
+        border-color: var(--content-border-color-dark);
+    }
+}
+
+.send-btn {
+    padding: 10px 20px;
+    background: #007BFF;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: background 0.2s;
+}
+
+.send-btn:hover {
+    background: #0056b3;
+}
+
+/* Show overlays when active */
+.overlay.show {
+    transform: translateX(0);
+    display: block;
+}
