@@ -354,3 +354,168 @@ body, html {
 .hidden {
     display: none !important;
 }
+
+/* Account Profile Styles */
+.account-profile {
+    padding: 20px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007BFF, #00E5FF);
+    margin-right: 20px;
+}
+
+.profile-info h2 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.profile-info p {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+.course-progress {
+    margin-bottom: 30px;
+}
+
+.progress-cards {
+    display: grid;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.course-card {
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.course-card h4 {
+    margin: 0 0 15px;
+    color: #007BFF;
+}
+
+.progress-bar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress {
+    height: 100%;
+    background: #007BFF;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    margin: 0 0 15px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.topics {
+    font-size: 0.9rem;
+}
+
+.topics p {
+    margin: 5px 0;
+}
+
+.current-topic, .difficulty-level {
+    font-weight: bold;
+    color: #007BFF;
+}
+
+.achievement-section {
+    margin-top: 30px;
+}
+
+.achievements {
+    display: grid;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.achievement:hover {
+    transform: translateY(-2px);
+}
+
+.achievement.locked {
+    opacity: 0.5;
+}
+
+.achievement-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.achievement-info h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.achievement-info p {
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .profile-info p {
+        color: #999;
+    }
+    
+    .course-card {
+        background: rgba(0, 123, 255, 0.2);
+    }
+    
+    .progress-bar {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .progress-text {
+        color: #999;
+    }
+    
+    .achievement {
+        background: rgba(0, 123, 255, 0.2);
+    }
+    
+    .achievement-icon {
+        background: #333;
+    }
+    
+    .achievement-info p {
+        color: #999;
+    }
+}

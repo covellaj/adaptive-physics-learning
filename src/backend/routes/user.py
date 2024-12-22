@@ -60,6 +60,9 @@ def register_user():
             }
         }), 201
     except Exception as e:
+        import traceback
+        print("Registration error:", str(e))
+        print("Traceback:", traceback.format_exc())
         db.rollback()
         return jsonify({"error": str(e)}), 500
     finally:

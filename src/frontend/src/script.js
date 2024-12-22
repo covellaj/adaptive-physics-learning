@@ -8,27 +8,72 @@ document.addEventListener("DOMContentLoaded", function() {
     const optionsOverlay = document.getElementById('options-overlay');
     const authOverlay = document.getElementById('auth-overlay');
     
-    // Debug: Log if elements were found
-    console.log("Elements found:", {
-        chatToggle: !!chatToggle,
-        optionsToggle: !!optionsToggle,
-        chatOverlay: !!chatOverlay,
-        optionsOverlay: !!optionsOverlay,
-        authOverlay: !!authOverlay
-    });
+    // Initialize variables for auth elements
+    let loginForm, registerForm, showRegisterLink, showLoginLink, loginLink, accountLink, logoutLink;
+    
+    function initializeElements() {
+        loginForm = document.getElementById('login-form');
+        registerForm = document.getElementById('register-form');
+        showRegisterLink = document.getElementById('show-register');
+        showLoginLink = document.getElementById('show-login');
+        loginLink = document.getElementById('login-link');
+        accountLink = document.getElementById('account-link');
+        logoutLink = document.getElementById('logout-link');
+        
+        console.log("Initializing elements, accountLink found:", !!accountLink);
+        
+        // Attach event listeners after getting elements
+        if (accountLink) {
+            console.log("Attaching account link click handler");
+            accountLink.addEventListener('click', function(e) {
+                console.log("Account link clicked");
+                e.preventDefault();
+                optionsOverlay.classList.remove('show');
+                optionsOverlay.classList.add('hidden');
+                
+                const accountOverlay = document.getElementById('account-overlay');
+                console.log("Account overlay found:", !!accountOverlay);
+                accountOverlay.classList.remove('hidden');
+                accountOverlay.classList.add('show');
+                
+                // Get user data from localStorage
+                const token = localStorage.getItem('token');
+                if (token) {
+                    fetch('http://localhost:5504/api/auth/verify', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.user) {
+                            document.getElementById('profile-name').textContent = data.user.name;
+                            document.getElementById('profile-email').textContent = data.user.email;
+                            
+                            // TODO: Fetch and update course progress
+                            // For now, we'll simulate some progress
+                            const progress = 35; // This would come from the backend
+                            document.querySelector('.progress').style.width = `${progress}%`;
+                            document.querySelector('.progress-text').textContent = `${progress}% Complete`;
+                            document.querySelector('.current-topic').textContent = 'Forces and Motion';
+                            document.querySelector('.difficulty-level').textContent = '2';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user data:', error);
+                    });
+                }
+            });
+        }
+    }
 
-    // Get auth form elements
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const showRegisterLink = document.getElementById('show-register');
-    const showLoginLink = document.getElementById('show-login');
-    const loginLink = document.getElementById('login-link');
-    const accountLink = document.getElementById('account-link');
-    const logoutLink = document.getElementById('logout-link');
-
-    // Check if user is logged in
     function checkAuthStatus() {
         const token = localStorage.getItem('token');
+        console.log("Checking auth status, token:", token ? "exists" : "not found");
+        
+        // Re-initialize elements to get fresh references
+        initializeElements();
+        
         if (token) {
             loginLink.classList.add('hidden');
             accountLink.classList.remove('hidden');
@@ -40,7 +85,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Call on page load
+    // Initialize elements first time
+    initializeElements();
+    
+    // Call checkAuthStatus on page load
     checkAuthStatus();
 
     // Toggle overlays
@@ -73,7 +121,6 @@ document.addEventListener("DOMContentLoaded", function() {
             authOverlay.classList.remove('show');
             authOverlay.classList.add('hidden');
         }
-        // Debug: Log current classes
         console.log("Options overlay classes:", optionsOverlay.className);
     });
 
@@ -88,7 +135,6 @@ document.addEventListener("DOMContentLoaded", function() {
         optionsOverlay.classList.add('hidden');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
-        // Debug: Log current classes
         console.log("Auth overlay classes:", authOverlay.className);
         console.log("Login form classes:", loginForm.className);
     });
