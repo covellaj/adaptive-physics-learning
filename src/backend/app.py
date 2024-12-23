@@ -5,6 +5,9 @@ from routes.content import content_bp
 from routes.adapt import adapt_bp
 from routes.chat import chat_bp
 from database.init_db import init_db
+
+from flask_cors import CORS
+
 import os
 import logging
 
@@ -22,13 +25,14 @@ def create_app():
     logger.debug(f"Static folder contents: {os.listdir(static_folder)}")
     
     app = Flask(__name__, static_folder=None)  # Disable default static handling
-    
-    # Enable CORS for all routes
+
+    # Configure CORS
     CORS(app, resources={
-        r"/api/*": {  # Enable CORS for all API routes
-            "origins": ["http://localhost:8000"],  # Allow requests from frontend server
-            "methods": ["GET", "POST", "PUT", "DELETE"],  # Allow all methods
-            "allow_headers": ["Content-Type", "Authorization"]  # Allow these headers
+        r"/api/*": {
+            "origins": ["http://localhost:8000"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "expose_headers": ["Content-Type", "Authorization"]
         }
     })
     

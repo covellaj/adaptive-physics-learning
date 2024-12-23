@@ -48,6 +48,7 @@
                 <ul>
                     <li><a href="#" id="login-link" title="Login">Login</a></li>
                     <li><a href="#" id="account-link" title="Account" class="hidden">Account</a></li>
+                    <li><a href="#" id="settings-link" title="Settings">Settings</a></li>
                     <li><a href="#" id="logout-link" title="Logout" class="hidden">Logout</a></li>
                     <li><a href="#" title="Courses">Courses</a></li>
                 </ul>
@@ -146,6 +147,47 @@
                         <button type="submit" class="submit-btn">Register</button>
                     </form>
                     <p class="switch-form">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Overlay -->
+        <div id="settings-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <button class="close-btn" data-close="settings-overlay">&times;</button>
+                <h2>Settings</h2>
+                <div class="settings-section">
+                    <h3>AI Model Selection</h3>
+                    <div class="setting-group">
+                        <label for="ai-model">Choose AI Model:</label>
+                        <select id="ai-model" class="setting-select">
+                            <option value="gpt4">OpenAI GPT-4</option>
+                            <option value="ollama-mistral">Ollama (Mistral)</option>
+                            <option value="ollama-llama2">Ollama (Llama2)</option>
+                            <option value="ollama-neural-chat">Ollama (Neural-Chat)</option>
+                        </select>
+                    </div>
+                    <div class="setting-info">
+                        <p>Model capabilities:</p>
+                        <ul id="model-capabilities">
+                            <li>Advanced physics understanding</li>
+                            <li>Natural conversation</li>
+                            <li>Context awareness</li>
+                            <li>Educational expertise</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Interface Settings</h3>
+                    <div class="setting-group">
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="auto-dark-mode" checked>
+                            <span class="toggle-label">Use system dark mode</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button id="save-settings" class="primary-button">Save Settings</button>
                 </div>
             </div>
         </div>

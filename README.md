@@ -31,9 +31,9 @@ python3 -c "from src.backend.database.init_db import init_db; init_db()"
 1. Start the backend server:
 ```bash
 # From the project root directory
-python3 src/backend/app.py
+PYTHONPATH=$PWD/src/backend python3 src/backend/app.py
 ```
-The backend will run on http://localhost:5500
+The backend will run on http://localhost:5504
 
 2. Start the frontend server:
 ```bash
@@ -47,9 +47,12 @@ The frontend will be available at http://localhost:8000
 
 - User registration and authentication
 - JWT-based session management
-- Adaptive learning algorithms (coming soon)
+- AI-powered learning assistant with model choice:
+  - OpenAI GPT-4
+  - Local Ollama models
+- Adaptive learning algorithms
 - Progress tracking
-- Interactive UI
+- Interactive UI with dark mode support
 
 ## Project Structure
 

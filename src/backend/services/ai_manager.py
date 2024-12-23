@@ -1,15 +1,71 @@
 import os
+import json
+import aiohttp
 from openai import OpenAI
 from dotenv import load_dotenv
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+from abc import ABC, abstractmethod
 
 # Load environment variables
 load_dotenv()
 
-class AIManager:
+class ModelBackend(ABC):
+    @abstractmethod
+    async def get_response(self, messages: List[Dict[str, str]]) -> str:
+        pass
+
+class OpenAIBackend(ModelBackend):
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        
+    async def get_response(self, messages: List[Dict[str, str]]) -> str:
+        response = await self.client.chat.completions.create(
+            model="gpt-4-0125-preview",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=500,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        return response.choices[0].message.content
+
+class OllamaBackend(ModelBackend):
+    def __init__(self, model_name: str):
+        self.model_name = model_name
+        self.base_url = "http://localhost:11434/api/chat"
+        
+    async def get_response(self, messages: List[Dict[str, str]]) -> str:
+        # Convert messages to Ollama format
+        ollama_messages = [
+            {"role": msg["role"], "content": msg["content"]}
+            for msg in messages
+        ]
+        
+        payload = {
+            "model": self.model_name,
+            "messages": ollama_messages,
+            "stream": False
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.base_url, json=payload) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    return result["message"]["content"]
+                else:
+                    error_text = await response.text()
+                    raise Exception(f"Ollama API error: {error_text}")
+
+class AIManager:
+    def __init__(self):
         self.conversation_history: Dict[str, List[Dict[str, str]]] = {}
+        self.model_backends = {
+            'gpt4': OpenAIBackend(),
+            'ollama-mistral': OllamaBackend('mistral'),
+            'ollama-llama2': OllamaBackend('llama2'),
+            'ollama-neural-chat': OllamaBackend('neural-chat')
+        }
         
         # System message defining the AI Manager's role
         self.system_message = """You are an AI Educational Manager for an adaptive physics learning platform. Your role is to:
@@ -44,27 +100,22 @@ If a student is struggling, break down complex topics into simpler parts."""
             "content": content
         })
 
-    async def get_response(self, user_id: str, message: str) -> str:
+    async def get_response(self, user_id: str, message: str, model: Optional[str] = None) -> str:
         """Get a response from the AI Manager"""
         # Add user message to history
         self.add_to_history(user_id, "user", message)
         
         try:
-            # Get completion from OpenAI
-            response = await self.client.chat.completions.create(
-                model="gpt-4-0125-preview",  # Using GPT-4-mini
-                messages=self.get_conversation_history(user_id),
-                temperature=0.7,
-                max_tokens=500,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-            )
+            # Use specified model or default to GPT-4
+            model_name = model or 'gpt4'
+            if model_name not in self.model_backends:
+                raise ValueError(f"Unknown model: {model_name}")
+                
+            backend = self.model_backends[model_name]
+            ai_message = await backend.get_response(self.get_conversation_history(user_id))
             
-            # Extract and store response
-            ai_message = response.choices[0].message.content
+            # Store response
             self.add_to_history(user_id, "assistant", ai_message)
-            
             return ai_message
             
         except Exception as e:

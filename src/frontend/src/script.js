@@ -8,9 +8,85 @@ document.addEventListener("DOMContentLoaded", function() {
     const optionsOverlay = document.getElementById('options-overlay');
     const authOverlay = document.getElementById('auth-overlay');
     
-    // Initialize variables for auth elements
-    let loginForm, registerForm, showRegisterLink, showLoginLink, loginLink, accountLink, logoutLink;
+    // Settings functionality
+    const settingsLink = document.getElementById('settings-link');
+    const settingsOverlay = document.getElementById('settings-overlay');
+    const aiModelSelect = document.getElementById('ai-model');
+    const modelCapabilities = document.getElementById('model-capabilities');
+    const saveSettingsBtn = document.getElementById('save-settings');
+    const autoDarkMode = document.getElementById('auto-dark-mode');
     
+    // Model capabilities descriptions
+    const modelInfo = {
+        'gpt4': [
+            'Advanced physics understanding',
+            'Natural conversation',
+            'Context awareness',
+            'Educational expertise'
+        ],
+        'ollama-mistral': [
+            'Efficient local processing',
+            'Good physics knowledge',
+            'Privacy-focused',
+            'Fast response time'
+        ],
+        'ollama-llama2': [
+            'Strong reasoning ability',
+            'Local execution',
+            'Open source model',
+            'Balanced performance'
+        ],
+        'ollama-neural-chat': [
+            'Optimized for conversation',
+            'Local processing',
+            'Light resource usage',
+            'Quick responses'
+        ]
+    };
+    
+    // Load saved settings
+    function loadSettings() {
+        const savedModel = localStorage.getItem('ai-model') || 'gpt4';
+        const savedDarkMode = localStorage.getItem('auto-dark-mode') !== 'false';
+        
+        aiModelSelect.value = savedModel;
+        autoDarkMode.checked = savedDarkMode;
+        updateModelCapabilities(savedModel);
+    }
+    
+    function updateModelCapabilities(model) {
+        const capabilities = modelInfo[model];
+        modelCapabilities.innerHTML = capabilities
+            .map(cap => `<li>${cap}</li>`)
+            .join('');
+    }
+    
+    // Settings event listeners
+    settingsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        optionsOverlay.classList.remove('show');
+        optionsOverlay.classList.add('hidden');
+        settingsOverlay.classList.remove('hidden');
+        settingsOverlay.classList.add('show');
+    });
+    
+    aiModelSelect.addEventListener('change', function() {
+        updateModelCapabilities(this.value);
+    });
+    
+    saveSettingsBtn.addEventListener('click', function() {
+        localStorage.setItem('ai-model', aiModelSelect.value);
+        localStorage.setItem('auto-dark-mode', autoDarkMode.checked);
+        
+        // Close settings overlay
+        settingsOverlay.classList.remove('show');
+        settingsOverlay.classList.add('hidden');
+        
+        // Show confirmation
+        alert('Settings saved successfully!');
+    });
+    
+    // Initialize elements and settings
     function initializeElements() {
         loginForm = document.getElementById('login-form');
         registerForm = document.getElementById('register-form');
@@ -19,54 +95,9 @@ document.addEventListener("DOMContentLoaded", function() {
         loginLink = document.getElementById('login-link');
         accountLink = document.getElementById('account-link');
         logoutLink = document.getElementById('logout-link');
-        
-        console.log("Initializing elements, accountLink found:", !!accountLink);
-        
-        // Attach event listeners after getting elements
-        if (accountLink) {
-            console.log("Attaching account link click handler");
-            accountLink.addEventListener('click', function(e) {
-                console.log("Account link clicked");
-                e.preventDefault();
-                optionsOverlay.classList.remove('show');
-                optionsOverlay.classList.add('hidden');
-                
-                const accountOverlay = document.getElementById('account-overlay');
-                console.log("Account overlay found:", !!accountOverlay);
-                accountOverlay.classList.remove('hidden');
-                accountOverlay.classList.add('show');
-                
-                // Get user data from localStorage
-                const token = localStorage.getItem('token');
-                if (token) {
-                    fetch('http://localhost:5504/api/auth/verify', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.user) {
-                            document.getElementById('profile-name').textContent = data.user.name;
-                            document.getElementById('profile-email').textContent = data.user.email;
-                            
-                            // TODO: Fetch and update course progress
-                            // For now, we'll simulate some progress
-                            const progress = 35; // This would come from the backend
-                            document.querySelector('.progress').style.width = `${progress}%`;
-                            document.querySelector('.progress-text').textContent = `${progress}% Complete`;
-                            document.querySelector('.current-topic').textContent = 'Forces and Motion';
-                            document.querySelector('.difficulty-level').textContent = '2';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching user data:', error);
-                    });
-                }
-            });
-        }
     }
-
+    
+    // Check if user is logged in
     function checkAuthStatus() {
         const token = localStorage.getItem('token');
         console.log("Checking auth status, token:", token ? "exists" : "not found");
@@ -84,12 +115,114 @@ document.addEventListener("DOMContentLoaded", function() {
             logoutLink.classList.add('hidden');
         }
     }
-
-    // Initialize elements first time
+    
+    // Initialize elements and settings
     initializeElements();
+    loadSettings();
     
     // Call checkAuthStatus on page load
     checkAuthStatus();
+
+    // Toggle overlays
+    chatToggle.addEventListener('click', function() {
+        if (chatOverlay.classList.contains('show')) {
+            chatOverlay.classList.remove('show');
+            chatOverlay.classList.add('hidden');
+        } else {
+            chatOverlay.classList.remove('hidden');
+            chatOverlay.classList.add('show');
+            optionsOverlay.classList.remove('show');
+            optionsOverlay.classList.add('hidden');
+            authOverlay.classList.remove('show');
+            authOverlay.classList.add('hidden');
+        }
+    });
+
+    optionsToggle.addEventListener('click', function() {
+        console.log("Options toggle clicked");
+        if (optionsOverlay.classList.contains('show')) {
+            console.log("Hiding options overlay");
+            optionsOverlay.classList.remove('show');
+            optionsOverlay.classList.add('hidden');
+        } else {
+            console.log("Showing options overlay");
+            optionsOverlay.classList.remove('hidden');
+            optionsOverlay.classList.add('show');
+            chatOverlay.classList.remove('show');
+            chatOverlay.classList.add('hidden');
+            authOverlay.classList.remove('show');
+            authOverlay.classList.add('hidden');
+        }
+        console.log("Options overlay classes:", optionsOverlay.className);
+    });
+
+    // Show account overlay
+    accountLink.addEventListener('click', function(e) {
+        console.log("Account link clicked");
+        e.preventDefault();
+        console.log("Showing account overlay");
+        const accountOverlay = document.getElementById('account-overlay');
+        accountOverlay.classList.remove('hidden');
+        accountOverlay.classList.add('show');
+        optionsOverlay.classList.remove('show');
+        optionsOverlay.classList.add('hidden');
+        
+        // Get user data from localStorage
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('http://localhost:5504/api/auth/verify', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user) {
+                    document.getElementById('profile-name').textContent = data.user.name;
+                    document.getElementById('profile-email').textContent = data.user.email;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+        }
+    });
+
+    // Show login overlay
+    loginLink.addEventListener('click', function(e) {
+        console.log("Login link clicked");
+        e.preventDefault();
+        console.log("Showing auth overlay");
+        authOverlay.classList.remove('hidden');
+        authOverlay.classList.add('show');
+        optionsOverlay.classList.remove('show');
+        optionsOverlay.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        console.log("Auth overlay classes:", authOverlay.className);
+        console.log("Login form classes:", loginForm.className);
+    });
+
+    // Switch between login and register forms
+    showRegisterLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+    });
+
+    showLoginLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        registerForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+    });
+
+    // Handle logout
+    logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('token');
+        checkAuthStatus();
+        optionsOverlay.classList.remove('show');
+    });
 
     // Chat functionality
     const chatMessages = document.getElementById('chat-messages');
@@ -141,30 +274,6 @@ document.addEventListener("DOMContentLoaded", function() {
         chatStatus.classList.add('hidden');
     }
     
-    // Toggle chat overlay and load history
-    chatToggle.addEventListener('click', function() {
-        if (chatOverlay.classList.contains('show')) {
-            chatOverlay.classList.remove('show');
-            chatOverlay.classList.add('hidden');
-        } else {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Please log in to use the chat.');
-                return;
-            }
-            
-            chatOverlay.classList.remove('hidden');
-            chatOverlay.classList.add('show');
-            optionsOverlay.classList.remove('show');
-            optionsOverlay.classList.add('hidden');
-            authOverlay.classList.remove('show');
-            authOverlay.classList.add('hidden');
-            
-            // Load chat history when opening chat
-            loadChatHistory();
-        }
-    });
-    
     // Handle chat form submission
     chatForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -192,7 +301,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ message })
+                body: JSON.stringify({
+                    message,
+                    model: localStorage.getItem('ai-model') || 'gpt4'
+                })
             });
             
             hideTypingIndicator();
@@ -201,67 +313,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 const data = await response.json();
                 addMessageToChat(data.response, 'assistant');
             } else {
-                addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
+                addMessageToChat('Sorry, I encountered an error receiving the response. Please try again.', 'assistant');
             }
         } catch (error) {
             console.error('Error sending message:', error);
             hideTypingIndicator();
-            addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
+            addMessageToChat('Sorry, I encountered an error sending the message. Please try again.', 'assistant');
         }
-    });
-
-    optionsToggle.addEventListener('click', function() {
-        console.log("Options toggle clicked");
-        if (optionsOverlay.classList.contains('show')) {
-            console.log("Hiding options overlay");
-            optionsOverlay.classList.remove('show');
-            optionsOverlay.classList.add('hidden');
-        } else {
-            console.log("Showing options overlay");
-            optionsOverlay.classList.remove('hidden');
-            optionsOverlay.classList.add('show');
-            chatOverlay.classList.remove('show');
-            chatOverlay.classList.add('hidden');
-            authOverlay.classList.remove('show');
-            authOverlay.classList.add('hidden');
-        }
-        console.log("Options overlay classes:", optionsOverlay.className);
-    });
-
-    // Show login overlay
-    loginLink.addEventListener('click', function(e) {
-        console.log("Login link clicked");
-        e.preventDefault();
-        console.log("Showing auth overlay");
-        authOverlay.classList.remove('hidden');
-        authOverlay.classList.add('show');
-        optionsOverlay.classList.remove('show');
-        optionsOverlay.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        console.log("Auth overlay classes:", authOverlay.className);
-        console.log("Login form classes:", loginForm.className);
-    });
-
-    // Switch between login and register forms
-    showRegisterLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        loginForm.classList.add('hidden');
-        registerForm.classList.remove('hidden');
-    });
-
-    showLoginLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        registerForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-    });
-
-    // Handle logout
-    logoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('token');
-        checkAuthStatus();
-        optionsOverlay.classList.remove('show');
     });
 
     // Handle form submissions
@@ -274,9 +332,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const response = await fetch('http://localhost:5504/api/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password })
             });
 
             if (response.ok) {
@@ -310,9 +368,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const response = await fetch('http://localhost:5504/api/auth/register', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ name, email, password })
             });
 
             if (response.ok) {
