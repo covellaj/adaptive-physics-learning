@@ -3,6 +3,7 @@ from flask_cors import CORS
 from routes.user import user_bp
 from routes.content import content_bp
 from routes.adapt import adapt_bp
+from routes.chat import chat_bp
 from database.init_db import init_db
 import os
 import logging
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(content_bp)
     app.register_blueprint(adapt_bp)  # Register adapt blueprint
+    app.register_blueprint(chat_bp)   # Register chat blueprint
     return app
 
 if __name__ == '__main__':

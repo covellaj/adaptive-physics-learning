@@ -91,18 +91,122 @@ document.addEventListener("DOMContentLoaded", function() {
     // Call checkAuthStatus on page load
     checkAuthStatus();
 
-    // Toggle overlays
+    // Chat functionality
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatStatus = document.querySelector('.chat-status');
+    
+    async function loadChatHistory() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        
+        try {
+            const response = await fetch('http://localhost:5504/api/chat/history', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                chatMessages.innerHTML = ''; // Clear existing messages
+                data.history.forEach(msg => {
+                    addMessageToChat(msg.content, msg.role);
+                });
+                scrollToBottom();
+            }
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
+    }
+    
+    function addMessageToChat(message, role) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', role);
+        messageDiv.textContent = message;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        chatStatus.classList.remove('hidden');
+    }
+    
+    function hideTypingIndicator() {
+        chatStatus.classList.add('hidden');
+    }
+    
+    // Toggle chat overlay and load history
     chatToggle.addEventListener('click', function() {
         if (chatOverlay.classList.contains('show')) {
             chatOverlay.classList.remove('show');
             chatOverlay.classList.add('hidden');
         } else {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to use the chat.');
+                return;
+            }
+            
             chatOverlay.classList.remove('hidden');
             chatOverlay.classList.add('show');
             optionsOverlay.classList.remove('show');
             optionsOverlay.classList.add('hidden');
             authOverlay.classList.remove('show');
             authOverlay.classList.add('hidden');
+            
+            // Load chat history when opening chat
+            loadChatHistory();
+        }
+    });
+    
+    // Handle chat form submission
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please log in to use the chat.');
+            return;
+        }
+        
+        // Add user message to chat
+        addMessageToChat(message, 'user');
+        chatInput.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        try {
+            const response = await fetch('http://localhost:5504/api/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ message })
+            });
+            
+            hideTypingIndicator();
+            
+            if (response.ok) {
+                const data = await response.json();
+                addMessageToChat(data.response, 'assistant');
+            } else {
+                addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            hideTypingIndicator();
+            addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
         }
     });
 
