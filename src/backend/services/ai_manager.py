@@ -1,6 +1,6 @@
 import os
 import json
-import aiohttp
+import requests
 from openai import OpenAI
 from dotenv import load_dotenv
 from typing import List, Dict, Any, Optional
@@ -11,15 +11,15 @@ load_dotenv()
 
 class ModelBackend(ABC):
     @abstractmethod
-    async def get_response(self, messages: List[Dict[str, str]]) -> str:
+    def get_response(self, messages: List[Dict[str, str]]) -> str:
         pass
 
 class OpenAIBackend(ModelBackend):
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         
-    async def get_response(self, messages: List[Dict[str, str]]) -> str:
-        response = await self.client.chat.completions.create(
+    def get_response(self, messages: List[Dict[str, str]]) -> str:
+        response = self.client.chat.completions.create(
             model="gpt-4-0125-preview",
             messages=messages,
             temperature=0.7,
@@ -35,7 +35,7 @@ class OllamaBackend(ModelBackend):
         self.model_name = model_name
         self.base_url = "http://localhost:11434/api/chat"
         
-    async def get_response(self, messages: List[Dict[str, str]]) -> str:
+    def get_response(self, messages: List[Dict[str, str]]) -> str:
         # Convert messages to Ollama format
         ollama_messages = [
             {"role": msg["role"], "content": msg["content"]}
@@ -48,14 +48,11 @@ class OllamaBackend(ModelBackend):
             "stream": False
         }
         
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.base_url, json=payload) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    return result["message"]["content"]
-                else:
-                    error_text = await response.text()
-                    raise Exception(f"Ollama API error: {error_text}")
+        response = requests.post(self.base_url, json=payload)
+        if response.status_code == 200:
+            return response.json()["message"]["content"]
+        else:
+            raise Exception(f"Ollama API error: {response.text}")
 
 class AIManager:
     def __init__(self):
@@ -100,7 +97,7 @@ If a student is struggling, break down complex topics into simpler parts."""
             "content": content
         })
 
-    async def get_response(self, user_id: str, message: str, model: Optional[str] = None) -> str:
+    def get_response(self, user_id: str, message: str, model: Optional[str] = None) -> str:
         """Get a response from the AI Manager"""
         # Add user message to history
         self.add_to_history(user_id, "user", message)
@@ -112,7 +109,7 @@ If a student is struggling, break down complex topics into simpler parts."""
                 raise ValueError(f"Unknown model: {model_name}")
                 
             backend = self.model_backends[model_name]
-            ai_message = await backend.get_response(self.get_conversation_history(user_id))
+            ai_message = backend.get_response(self.get_conversation_history(user_id))
             
             # Store response
             self.add_to_history(user_id, "assistant", ai_message)

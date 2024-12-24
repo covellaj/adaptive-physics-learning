@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM Content Loaded");
-    
     // Get overlay elements
     const chatToggle = document.getElementById('chat-toggle');
     const optionsToggle = document.getElementById('options-toggle');
@@ -100,7 +98,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Check if user is logged in
     function checkAuthStatus() {
         const token = localStorage.getItem('token');
-        console.log("Checking auth status, token:", token ? "exists" : "not found");
         
         // Re-initialize elements to get fresh references
         initializeElements();
@@ -139,13 +136,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     optionsToggle.addEventListener('click', function() {
-        console.log("Options toggle clicked");
         if (optionsOverlay.classList.contains('show')) {
-            console.log("Hiding options overlay");
             optionsOverlay.classList.remove('show');
             optionsOverlay.classList.add('hidden');
         } else {
-            console.log("Showing options overlay");
             optionsOverlay.classList.remove('hidden');
             optionsOverlay.classList.add('show');
             chatOverlay.classList.remove('show');
@@ -153,14 +147,11 @@ document.addEventListener("DOMContentLoaded", function() {
             authOverlay.classList.remove('show');
             authOverlay.classList.add('hidden');
         }
-        console.log("Options overlay classes:", optionsOverlay.className);
     });
 
     // Show account overlay
     accountLink.addEventListener('click', function(e) {
-        console.log("Account link clicked");
         e.preventDefault();
-        console.log("Showing account overlay");
         const accountOverlay = document.getElementById('account-overlay');
         accountOverlay.classList.remove('hidden');
         accountOverlay.classList.add('show');
@@ -190,17 +181,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Show login overlay
     loginLink.addEventListener('click', function(e) {
-        console.log("Login link clicked");
         e.preventDefault();
-        console.log("Showing auth overlay");
         authOverlay.classList.remove('hidden');
         authOverlay.classList.add('show');
         optionsOverlay.classList.remove('show');
         optionsOverlay.classList.add('hidden');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
-        console.log("Auth overlay classes:", authOverlay.className);
-        console.log("Login form classes:", loginForm.className);
     });
 
     // Switch between login and register forms
@@ -295,30 +282,50 @@ document.addEventListener("DOMContentLoaded", function() {
         showTypingIndicator();
         
         try {
+            // Log chat request details
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+            const body = {
+                message,
+                model: localStorage.getItem('ai-model') || 'gpt4'
+            };
+            
+            console.log('\n=== Outgoing Chat Request ===');
+            console.log('URL:', 'http://localhost:5504/api/chat/message');
+            console.log('Headers:', headers);
+            console.log('Body:', body);
+            console.log('===========================\n');
+            
             const response = await fetch('http://localhost:5504/api/chat/message', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    message,
-                    model: localStorage.getItem('ai-model') || 'gpt4'
-                })
+                headers: headers,
+                body: JSON.stringify(body)
             });
             
-            hideTypingIndicator();
+            console.log('\n=== Chat Response ===');
+            console.log('Status:', response.status);
+            console.log('Headers:', Object.fromEntries(response.headers.entries()));
             
             if (response.ok) {
                 const data = await response.json();
+                console.log('Response data:', data);
                 addMessageToChat(data.response, 'assistant');
             } else {
-                addMessageToChat('Sorry, I encountered an error receiving the response. Please try again.', 'assistant');
+                const errorText = await response.text();
+                console.log('Response error:', errorText);
+                addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
             }
-        } catch (error) {
-            console.error('Error sending message:', error);
+            console.log('===================\n');
+            
             hideTypingIndicator();
-            addMessageToChat('Sorry, I encountered an error sending the message. Please try again.', 'assistant');
+        } catch (error) {
+            console.error('\n=== Chat Error ===');
+            console.error('Error details:', error);
+            console.error('=================\n');
+            hideTypingIndicator();
+            addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
         }
     });
 

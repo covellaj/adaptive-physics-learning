@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from routes.user import user_bp
 from routes.content import content_bp
@@ -20,21 +20,26 @@ def create_app():
     logger.debug("Database initialized")
     
     static_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'src'))
-    logger.debug(f"Static folder path: {static_folder}")
-    logger.debug(f"Static folder exists: {os.path.exists(static_folder)}")
-    logger.debug(f"Static folder contents: {os.listdir(static_folder)}")
-    
     app = Flask(__name__, static_folder=None)  # Disable default static handling
 
-    # Configure CORS
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:8000"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "expose_headers": ["Content-Type", "Authorization"]
-        }
-    })
+    # Configure CORS - must be first
+    CORS(app, 
+         resources={r"/api/*": {"origins": "http://localhost:8000"}},
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+
+    # Log requests for debugging
+    @app.after_request
+    def after_request(response):
+        print(f"\n=== {request.method} {request.path} ===")
+        print("Request Headers:")
+        for name, value in request.headers.items():
+            print(f"  {name}: {value}")
+        print("\nResponse Headers:")
+        for name, value in response.headers.items():
+            print(f"  {name}: {value}")
+        print("===========================\n")
+        return response
     
     @app.route('/')
     def serve_index():

@@ -31,14 +31,8 @@ def token_required(f):
 
 @chat_bp.route('/api/chat/message', methods=['POST'])
 @token_required
-async def send_message(current_user_id):
-    print("Received chat message request")
-    print(f"Headers: {dict(request.headers)}")
-    print(f"Method: {request.method}")
-    print(f"Data: {request.get_data()}")
-    
+def send_message(current_user_id):
     data = request.get_json()
-    print(f"Parsed JSON data: {data}")
     message = data.get('message')
     
     if not message:
@@ -47,7 +41,7 @@ async def send_message(current_user_id):
     try:
         # Get selected model from request
         model = data.get('model', 'gpt4')
-        response = await ai_manager.get_response(current_user_id, message, model)
+        response = ai_manager.get_response(current_user_id, message, model)
         return jsonify({
             'response': response,
             'success': True,
