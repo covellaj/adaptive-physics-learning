@@ -1,4 +1,47 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Navigation history stack
+    const navigationStack = [];
+    let currentOverlay = null;
+
+    // Function to show an overlay
+    function showOverlay(overlayId, addToHistory = true) {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) return;
+
+        // Hide current overlay if exists
+        if (currentOverlay) {
+            currentOverlay.classList.remove('show');
+            currentOverlay.classList.add('hidden');
+        }
+
+        // Show new overlay
+        overlay.classList.remove('hidden');
+        overlay.classList.add('show');
+
+        // Update navigation
+        if (addToHistory && currentOverlay) {
+            navigationStack.push(currentOverlay.id);
+            overlay.classList.remove('no-history');
+        }
+        currentOverlay = overlay;
+    }
+
+    // Handle back button clicks
+    document.querySelectorAll('.back-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (navigationStack.length > 0) {
+                const previousOverlayId = navigationStack.pop();
+                showOverlay(previousOverlayId, false);
+                
+                // Update history status
+                const overlay = document.getElementById(previousOverlayId);
+                if (navigationStack.length === 0) {
+                    overlay.classList.add('no-history');
+                }
+            }
+        });
+    });
+
     // Get overlay elements
     const chatToggle = document.getElementById('chat-toggle');
     const optionsToggle = document.getElementById('options-toggle');
@@ -62,10 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Settings event listeners
     settingsLink.addEventListener('click', function(e) {
         e.preventDefault();
-        optionsOverlay.classList.remove('show');
-        optionsOverlay.classList.add('hidden');
-        settingsOverlay.classList.remove('hidden');
-        settingsOverlay.classList.add('show');
+        showOverlay('settings-overlay');
     });
     
     aiModelSelect.addEventListener('change', function() {
@@ -128,13 +168,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (chatOverlay.classList.contains('show')) {
             chatOverlay.classList.remove('show');
             chatOverlay.classList.add('hidden');
+            currentOverlay = null;
         } else {
-            chatOverlay.classList.remove('hidden');
-            chatOverlay.classList.add('show');
-            optionsOverlay.classList.remove('show');
-            optionsOverlay.classList.add('hidden');
-            authOverlay.classList.remove('show');
-            authOverlay.classList.add('hidden');
+            showOverlay('chat-overlay');
         }
     });
 
@@ -142,24 +178,16 @@ document.addEventListener("DOMContentLoaded", function() {
         if (optionsOverlay.classList.contains('show')) {
             optionsOverlay.classList.remove('show');
             optionsOverlay.classList.add('hidden');
+            currentOverlay = null;
         } else {
-            optionsOverlay.classList.remove('hidden');
-            optionsOverlay.classList.add('show');
-            chatOverlay.classList.remove('show');
-            chatOverlay.classList.add('hidden');
-            authOverlay.classList.remove('show');
-            authOverlay.classList.add('hidden');
+            showOverlay('options-overlay');
         }
     });
 
     // Show account overlay
     accountLink.addEventListener('click', function(e) {
         e.preventDefault();
-        const accountOverlay = document.getElementById('account-overlay');
-        accountOverlay.classList.remove('hidden');
-        accountOverlay.classList.add('show');
-        optionsOverlay.classList.remove('show');
-        optionsOverlay.classList.add('hidden');
+        showOverlay('account-overlay');
         
         // Get user data from localStorage
         const token = localStorage.getItem('token');
@@ -185,10 +213,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Show login overlay
     loginLink.addEventListener('click', function(e) {
         e.preventDefault();
-        authOverlay.classList.remove('hidden');
-        authOverlay.classList.add('show');
-        optionsOverlay.classList.remove('show');
-        optionsOverlay.classList.add('hidden');
+        showOverlay('auth-overlay');
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
     });
@@ -211,7 +236,11 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         localStorage.removeItem('token');
         checkAuthStatus();
-        optionsOverlay.classList.remove('show');
+        if (currentOverlay) {
+            currentOverlay.classList.remove('show');
+            currentOverlay.classList.add('hidden');
+            currentOverlay = null;
+        }
     });
 
     // Chat functionality
@@ -285,48 +314,28 @@ document.addEventListener("DOMContentLoaded", function() {
         showTypingIndicator();
         
         try {
-            // Log chat request details
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
-            const body = {
-                message,
-                model: localStorage.getItem('ai-model') || 'gpt4'
-            };
-            
-            console.log('\n=== Outgoing Chat Request ===');
-            console.log('URL:', 'http://localhost:5504/api/chat/message');
-            console.log('Headers:', headers);
-            console.log('Body:', body);
-            console.log('===========================\n');
-            
             const response = await fetch('http://localhost:5504/api/chat/message', {
                 method: 'POST',
-                headers: headers,
-                body: JSON.stringify(body)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message,
+                    model: localStorage.getItem('ai-model') || 'gpt4'
+                })
             });
             
-            console.log('\n=== Chat Response ===');
-            console.log('Status:', response.status);
-            console.log('Headers:', Object.fromEntries(response.headers.entries()));
+            hideTypingIndicator();
             
             if (response.ok) {
                 const data = await response.json();
-                console.log('Response data:', data);
                 addMessageToChat(data.response, 'assistant');
             } else {
-                const errorText = await response.text();
-                console.log('Response error:', errorText);
                 addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
             }
-            console.log('===================\n');
-            
-            hideTypingIndicator();
         } catch (error) {
-            console.error('\n=== Chat Error ===');
-            console.error('Error details:', error);
-            console.error('=================\n');
+            console.error('Error sending message:', error);
             hideTypingIndicator();
             addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
         }
@@ -405,6 +414,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const overlay = document.getElementById(target);
             overlay.classList.remove('show');
             overlay.classList.add('hidden');
+            currentOverlay = null;
+            navigationStack.length = 0; // Clear navigation stack
         });
     });
 });
