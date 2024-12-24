@@ -144,8 +144,7 @@ body, html {
     position: fixed;
     top: 0;
     right: 0;
-    width: 75%;
-    max-width: 1200px;
+    width: 400px;
     height: 100%;
     border-left: 1px solid;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
@@ -154,6 +153,12 @@ body, html {
     transition: transform 0.3s ease-in-out;
     z-index: 9999;
     overflow: hidden;
+}
+
+/* Special width for chat overlay */
+#chat-overlay {
+    width: 75%;
+    max-width: 1200px;
 }
 
 @media (max-width: 768px) {
@@ -231,11 +236,12 @@ body, html {
     flex-direction: column;
     height: 100%;
     max-height: 100vh;
-    padding: 20px;
+    padding: 20px 20px 0 20px;
 }
 
 .chat-panel h2 {
     margin: 0 0 20px 0;
+    flex-shrink: 0;
 }
 
 .chat-body {
@@ -249,6 +255,7 @@ body, html {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-height: 200px;
 }
 
 /* Adjust chat-body border for dark/light */
@@ -320,7 +327,10 @@ body, html {
     padding: 20px;
     border-top: 1px solid var(--content-border-color-light);
     background: var(--overlay-bg-light);
-    margin: 0 -20px -20px -20px;
+    margin: 0 -20px 0 -20px;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
 }
 
 .chat-input-section form {
