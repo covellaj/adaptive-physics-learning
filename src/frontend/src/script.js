@@ -1,3 +1,5 @@
+import { physicsTopics, getSubtopicsByTopic } from './data/courses/physics.js';
+
 document.addEventListener("DOMContentLoaded", function() {
     // Navigation history stack
     const navigationStack = [];
@@ -159,6 +161,92 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize elements and settings
     initializeElements();
     loadSettings();
+
+    // Courses functionality
+    const coursesLink = document.getElementById('courses-link');
+    const coursesOverlay = document.getElementById('courses-overlay');
+    const courseSelect = document.getElementById('course-select');
+    const topicSelect = document.getElementById('topic-select');
+    const subtopicsContainer = document.querySelector('.subtopics-container');
+
+    // Handle course selection
+    courseSelect.addEventListener('change', function() {
+        if (this.value === 'physics') {
+            topicSelect.disabled = false;
+        } else {
+            topicSelect.disabled = true;
+            topicSelect.value = '';
+            hideAllSubtopics();
+        }
+    });
+
+    // Handle topic selection
+    topicSelect.addEventListener('change', function() {
+        hideAllSubtopics();
+        if (this.value) {
+            const topicGrid = document.querySelector(`.${this.value}-topics`);
+            if (topicGrid) {
+                topicGrid.classList.remove('hidden');
+            } else {
+                // Dynamically create topic grid if it doesn't exist
+                const subtopics = getSubtopicsByTopic(this.value);
+                if (Object.keys(subtopics).length > 0) {
+                    createSubtopicGrid(this.value, subtopics);
+                }
+            }
+        }
+    });
+
+    function hideAllSubtopics() {
+        const grids = subtopicsContainer.querySelectorAll('.subtopics-grid');
+        grids.forEach(grid => grid.classList.add('hidden'));
+    }
+
+    function createSubtopicGrid(topicKey, subtopics) {
+        const grid = document.createElement('div');
+        grid.className = `subtopics-grid ${topicKey}-topics`;
+        
+        Object.entries(subtopics).forEach(([key, subtopic]) => {
+            const card = document.createElement('div');
+            card.className = 'subtopic-card';
+            if (subtopic.prerequisites.length > 0) {
+                card.classList.add('locked');
+            }
+            
+            card.innerHTML = `
+                <div class="subtopic-icon">${subtopic.icon}</div>
+                <h4>${subtopic.name}</h4>
+                <p>${subtopic.description}</p>
+                ${subtopic.prerequisites.length > 0 
+                    ? `<div class="unlock-message">Complete prerequisites first</div>`
+                    : `<div class="difficulty-indicator">
+                        ${Array(3).fill(0).map((_, i) => 
+                            `<span class="difficulty-dot${i < subtopic.difficulty ? ' active' : ''}"></span>`
+                        ).join('')}
+                       </div>`
+                }
+            `;
+            
+            // Add click handler
+            if (!subtopic.prerequisites.length) {
+                card.addEventListener('click', () => {
+                    // Handle subtopic selection
+                    console.log(`Selected subtopic: ${subtopic.name}`);
+                    // TODO: Implement subtopic selection logic
+                });
+            }
+            
+            grid.appendChild(card);
+        });
+        
+        subtopicsContainer.appendChild(grid);
+    }
+
+    // Show courses overlay
+    coursesLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        showOverlay('courses-overlay');
+    });
     
     // Call checkAuthStatus on page load
     checkAuthStatus();
@@ -415,7 +503,6 @@ document.addEventListener("DOMContentLoaded", function() {
             overlay.classList.remove('show');
             overlay.classList.add('hidden');
             currentOverlay = null;
-            navigationStack.length = 0; // Clear navigation stack
         });
     });
 });

@@ -56,7 +56,7 @@
                     <li><a href="#" id="account-link" title="Account" class="hidden">Account</a></li>
                     <li><a href="#" id="settings-link" title="Settings">Settings</a></li>
                     <li><a href="#" id="logout-link" title="Logout" class="hidden">Logout</a></li>
-                    <li><a href="#" title="Courses">Courses</a></li>
+                    <li><a href="#" id="courses-link" title="Courses">Courses</a></li>
                 </ul>
             </div>
         </div>
@@ -205,6 +205,109 @@
                         <button type="submit" class="submit-btn">Register</button>
                     </form>
                     <p class="switch-form">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Overlay -->
+        <div id="courses-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <div class="overlay-header">
+                    <button class="nav-btn back-btn" title="Go back">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h2>Courses</h2>
+                    <button class="nav-btn close-btn" data-close="courses-overlay" title="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="courses-content">
+                    <div class="course-selection">
+                        <div class="select-group">
+                            <label for="course-select">Select Course</label>
+                            <select id="course-select" class="course-select">
+                                <option value="physics">Physics</option>
+                                <option value="coming-soon" disabled>Chemistry (Coming Soon)</option>
+                                <option value="coming-soon" disabled>Biology (Coming Soon)</option>
+                            </select>
+                        </div>
+
+                        <div class="select-group">
+                            <label for="topic-select">Select Topic</label>
+                            <select id="topic-select" class="topic-select">
+                                <option value="">Choose a topic...</option>
+                                <option value="mechanics">Mechanics</option>
+                                <option value="thermodynamics">Thermodynamics</option>
+                                <option value="waves">Waves & Oscillations</option>
+                                <option value="em">Electricity & Magnetism</option>
+                                <option value="modern">Modern Physics</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="subtopics-container">
+                        <!-- Mechanics subtopics -->
+                        <div class="subtopics-grid mechanics-topics hidden">
+                            <div class="subtopic-card">
+                                <div class="subtopic-icon">📏</div>
+                                <h4>Kinematics</h4>
+                                <p>Motion in one and two dimensions</p>
+                                <div class="difficulty-indicator">
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot"></span>
+                                    <span class="difficulty-dot"></span>
+                                </div>
+                            </div>
+                            <div class="subtopic-card">
+                                <div class="subtopic-icon">🎯</div>
+                                <h4>Forces</h4>
+                                <p>Newton's laws and their applications</p>
+                                <div class="difficulty-indicator">
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot"></span>
+                                </div>
+                            </div>
+                            <div class="subtopic-card">
+                                <div class="subtopic-icon">⚡</div>
+                                <h4>Energy</h4>
+                                <p>Work, energy, and conservation laws</p>
+                                <div class="difficulty-indicator">
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot"></span>
+                                </div>
+                            </div>
+                            <div class="subtopic-card">
+                                <div class="subtopic-icon">🔄</div>
+                                <h4>Momentum</h4>
+                                <p>Linear and angular momentum</p>
+                                <div class="difficulty-indicator">
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot active"></span>
+                                    <span class="difficulty-dot active"></span>
+                                </div>
+                            </div>
+                            <div class="subtopic-card locked">
+                                <div class="subtopic-icon">🌟</div>
+                                <h4>Rotational Motion</h4>
+                                <p>Angular kinematics and dynamics</p>
+                                <div class="unlock-message">Complete previous topics first</div>
+                            </div>
+                        </div>
+
+                        <!-- Thermodynamics subtopics -->
+                        <div class="subtopics-grid thermo-topics hidden">
+                            <!-- Will be populated when selected -->
+                        </div>
+
+                        <!-- Other topic sections will be similar -->
+                    </div>
                 </div>
             </div>
         </div>
