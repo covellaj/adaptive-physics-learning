@@ -85,21 +85,8 @@
                     </div>
                     <div class="achievement-section">
                         <h3>Achievements</h3>
-                        <div class="achievements">
-                            <div class="achievement">
-                                <div class="achievement-icon">🎯</div>
-                                <div class="achievement-info">
-                                    <h4>Getting Started</h4>
-                                    <p>Completed first lesson</p>
-                                </div>
-                            </div>
-                            <div class="achievement locked">
-                                <div class="achievement-icon">🏆</div>
-                                <div class="achievement-info">
-                                    <h4>Physics Master</h4>
-                                    <p>Complete all lessons with 90%+ accuracy</p>
-                                </div>
-                            </div>
+                        <div id="achievements-list" class="achievements">
+                            <!-- Achievements will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -223,6 +210,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="data/achievements.js" type="module"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>
