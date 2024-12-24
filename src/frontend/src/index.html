@@ -43,8 +43,14 @@
         <!-- Options Overlay -->
         <div id="options-overlay" class="overlay hidden">
             <div class="overlay-content">
-                <button class="close-btn" data-close="options-overlay">&times;</button>
-                <h2>Options</h2>
+                <div class="overlay-header">
+                    <h2>Options</h2>
+                    <button class="nav-btn close-btn" data-close="options-overlay" title="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
                 <ul>
                     <li><a href="#" id="login-link" title="Login">Login</a></li>
                     <li><a href="#" id="account-link" title="Account" class="hidden">Account</a></li>
@@ -83,22 +89,68 @@
                         <h3>Course Progress</h3>
                         <div class="progress-cards">
                             <div class="course-card">
-                                <h4>Mechanics</h4>
+                                <div class="course-header">
+                                    <h4>Mechanics</h4>
+                                    <span class="difficulty">Level 2</span>
+                                </div>
                                 <div class="progress-bar">
-                                    <div class="progress" style="width: 0%"></div>
+                                    <div class="progress" style="width: 35%">
+                                        <span class="progress-text">35%</span>
+                                    </div>
                                 </div>
-                                <p class="progress-text">0% Complete</p>
                                 <div class="topics">
-                                    <p>Current Topic: <span class="current-topic">Not Started</span></p>
-                                    <p>Difficulty Level: <span class="difficulty-level">1</span></p>
+                                    <div class="topic-item">
+                                        <span class="topic-label">Current Topic:</span>
+                                        <span class="topic-value">Newton's Laws</span>
+                                    </div>
+                                    <div class="topic-item">
+                                        <span class="topic-label">Next Up:</span>
+                                        <span class="topic-value">Conservation of Energy</span>
+                                    </div>
                                 </div>
+                            </div>
+                            
+                            <div class="course-card">
+                                <div class="course-header">
+                                    <h4>Thermodynamics</h4>
+                                    <span class="difficulty locked">Locked</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 0%">
+                                        <span class="progress-text">0%</span>
+                                    </div>
+                                </div>
+                                <p class="unlock-message">Complete Mechanics to unlock</p>
                             </div>
                         </div>
                     </div>
                     <div class="achievement-section">
-                        <h3>Achievements</h3>
-                        <div id="achievements-list" class="achievements">
-                            <!-- Achievements will be loaded dynamically -->
+                        <h3>Recent Achievements</h3>
+                        <div class="achievements">
+                            <div class="achievement">
+                                <div class="achievement-icon">🎯</div>
+                                <div class="achievement-info">
+                                    <h4>First Steps in Physics</h4>
+                                    <p>Completed your first physics lesson</p>
+                                    <div class="achievement-meta">
+                                        <span class="achievement-date">Today</span>
+                                        <span class="achievement-points">+50 XP</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">⚡</div>
+                                <div class="achievement-info">
+                                    <h4>Quick Learner</h4>
+                                    <p>Complete 5 lessons in under 30 minutes</p>
+                                    <div class="achievement-progress">
+                                        <div class="mini-progress">
+                                            <div class="mini-bar" style="width: 40%"></div>
+                                        </div>
+                                        <span>2/5 lessons</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,7 +160,14 @@
         <!-- Auth Overlay -->
         <div id="auth-overlay" class="overlay hidden">
             <div class="overlay-content">
-                <button class="close-btn" data-close="auth-overlay">&times;</button>
+                <div class="overlay-header">
+                    <h2>Authentication</h2>
+                    <button class="nav-btn close-btn" data-close="auth-overlay" title="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
                 <div id="login-form" class="auth-form">
                     <h2>Login</h2>
                     <form id="loginForm">
@@ -205,8 +264,14 @@
         <!-- Chat Overlay -->
         <div id="chat-overlay" class="overlay hidden">
             <div class="overlay-content chat-panel">
-                <button class="close-btn" data-close="chat-overlay">&times;</button>
-                <h2>Physics Learning Assistant</h2>
+                <div class="overlay-header">
+                    <h2>Physics Learning Assistant</h2>
+                    <button class="nav-btn close-btn" data-close="chat-overlay" title="Close">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
                 <div class="chat-body" id="chat-messages">
                     <!-- Messages will be added here dynamically -->
                 </div>
