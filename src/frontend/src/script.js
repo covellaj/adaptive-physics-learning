@@ -84,6 +84,9 @@ document.addEventListener("DOMContentLoaded", function() {
         alert('Settings saved successfully!');
     });
     
+    // Declare global variables for DOM elements
+    let loginForm, registerForm, showRegisterLink, showLoginLink, loginLink, accountLink, logoutLink;
+    
     // Initialize elements and settings
     function initializeElements() {
         loginForm = document.getElementById('login-form');
